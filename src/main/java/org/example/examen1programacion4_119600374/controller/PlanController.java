@@ -73,7 +73,7 @@ public class PlanController {
         PacienteMedicamento pm = pmRepo.findById(pmId).orElse(null);
 
         if (pm != null && cantidad != null && cantidad > 0) {
-            pm.setDosisafavor(pm.getDosisafavor() + cantidad);
+            pm.setDosisafavor(pm.getDosisfavor() + cantidad);
             pmRepo.save(pm);
         }
 
@@ -83,25 +83,21 @@ public class PlanController {
 
     //en el flujo dos mencionado por le profe se hace la disponibilidad y un posible error
     @PostMapping("/medicamento/entregar")
-    public String entregar(@RequestParam Integer pmId,
-                           @RequestParam String cedula,
-                           RedirectAttributes ra) {
+    public String entregar(@RequestParam Integer idd, @RequestParam String ced, RedirectAttributes redireccion) {
 
-        PacienteMedicamento pm = pmRepo.findById(pmId).orElse(null);
-        if (pm != null) {
-            int planRequerido = pm.getMedicamento().getPlan();
-            int acumuladas    = pm.getDosisafavor();
-            if (acumuladas >= planRequerido) {
-                pm.setDosisafavor(acumuladas - planRequerido);
-                pmRepo.save(pm);
+        PacienteMedicamento paciMe = pmRepo.findById(idd).orElse(null);
+        if (paciMe != null) {
+            int plan = paciMe.getMedicamento().getPlan();
+            int acumu    = paciMe.getDosisfavor();
+            if (acumu >= plan) {
+                paciMe.setDosisafavor(acumu - plan);
+                pmRepo.save(paciMe);
             } else {
                //aqui esta el error del enunciado
-                ra.addFlashAttribute("errorEntregar",
-                        "No hay dosis suficientes a favor para entregar");
+                redireccion.addFlashAttribute("errorEntregar", "No hay dosis suficientes a favor para entregar");
             }
         }
-
-        ra.addAttribute("cedula", cedula);
+        redireccion.addAttribute("cedula", ced);
         return "redirect:/presentation/plan/refrescar";
     }
 
@@ -110,23 +106,21 @@ public class PlanController {
         String usuarioId = userDetails.getUsername();
         Farmacia farmacia = farmaciaRepo.findByUsuario(usuarioId);
         model.addAttribute("usuarioId",    usuarioId);
-        model.addAttribute("farmaciaNombre",
-                farmacia != null ? farmacia.getNombre() : usuarioId);
+        model.addAttribute("farmaciaNombre", farmacia != null ? farmacia.getNombre() : usuarioId);
     }
-
-    private void buscarPaciente(String cedula, Model model) {
-        model.addAttribute("cedula", cedula != null ? cedula : "");
-        if (cedula == null || cedula.isBlank()) {
+//se busca el paciente solamente por la cedula
+    private void buscarPaciente(String ced, Model model) {
+        model.addAttribute("cedula", ced != null ? ced : "");
+        if (ced == null || ced.isBlank()) {
             model.addAttribute("paciente",     null);
             model.addAttribute("medicamentos", Collections.emptyList());
             return;
         }
 
-        Paciente paciente = pacienteRepo.findById(cedula.trim()).orElse(null);
+        Paciente paciente = pacienteRepo.findById(ced.trim()).orElse(null);
         model.addAttribute("paciente", paciente);
 
-        List<PacienteMedicamento> medicamentos = paciente != null
-                ? pmRepo.findByPaciente(paciente)
+        List<PacienteMedicamento> medicamentos = paciente != null ? pmRepo.findByPaciente(paciente)
                 : Collections.emptyList();
         model.addAttribute("medicamentos", medicamentos);
     }

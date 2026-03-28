@@ -62,7 +62,7 @@
 <body>
 
 <div class="page-header">
-    <img th:src="@{/images/header.jpg}" alt="Patient Care" style="max-height: 80px;"/>
+    <img th:src="@{/images/header.jpg}" alt="Patient Care" style="max-height: 150px;"/>
 </div>
 <div style="background-color: #2255AA; color: white; text-align: center; padding: 8px; font-weight: bold; font-size: 15px;">
     INGRESO
@@ -72,11 +72,11 @@
     <div class="login-card">
 
         <div class="avatar">
-            <img th:src="@{/images/login.png}" alt="usuario" style="width: 60px; height: 60px;"/>
+            <img th:src="@{/images/login.png}" alt="usuario" style="width: 80px; height: 80px;"/>
         </div>
 
         <div th:if="${param.error}" class="msg-error">
-            Usuario o clave incorrectos.
+            Usuario (ID) o Clave Incorrectos.
         </div>
 
         <form th:action="@{/login}" method="post">

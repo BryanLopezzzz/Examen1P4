@@ -10,10 +10,13 @@ public class PacienteMedicamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    //de uno a muchos, similar a la cardinalidad de bases de datos :))
+    //n->1
     @ManyToOne
     @JoinColumn(name = "paciente", referencedColumnName = "id", nullable = false)
     private Paciente paciente;
 
+    //igual acá jeje
     @ManyToOne
     @JoinColumn(name = "medicamento", referencedColumnName = "id", nullable = false)
     private Medicamento medicamento;
@@ -32,7 +35,7 @@ public class PacienteMedicamento {
     public Medicamento getMedicamento()             { return medicamento; }
     public void setMedicamento(Medicamento m)       { this.medicamento = m; }
 
-    public Integer getDosisafavor()                 { return dosisafavor; }
+    public Integer getDosisfavor()                 { return dosisafavor; }
     public void setDosisafavor(Integer d)           { this.dosisafavor = d; }
 
     public String getSelectLabel() {
