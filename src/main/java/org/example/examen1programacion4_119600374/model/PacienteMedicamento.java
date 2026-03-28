@@ -18,7 +18,6 @@ public class PacienteMedicamento {
     @JoinColumn(name = "medicamento", referencedColumnName = "id", nullable = false)
     private Medicamento medicamento;
 
-    // Acumuladas: dosis compradas que aún no se han canjeado
     @Column
     private Integer dosisafavor;
 
@@ -36,17 +35,10 @@ public class PacienteMedicamento {
     public Integer getDosisafavor()                 { return dosisafavor; }
     public void setDosisafavor(Integer d)           { this.dosisafavor = d; }
 
-    /**
-     * Retorna el label completo para el <select> en la vista.
-     * Ej: "Taladaf 5mg (1 + 1) [0]"
-     */
     public String getSelectLabel() {
         return medicamento.getLabel() + " [" + dosisafavor + "]";
     }
 
-    /**
-     * ¿Tiene suficientes acumuladas para recibir al menos 1 regalía?
-     */
     public boolean puedeEntregar() {
         return dosisafavor != null
                 && medicamento.getPlan() != null

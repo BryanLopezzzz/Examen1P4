@@ -8,7 +8,7 @@ public class Paciente {
 
     @Id
     @Column(length = 20, nullable = false)
-    private String id;          // cédula
+    private String id;
 
     @Column(length = 30, nullable = false)
     private String nombre;

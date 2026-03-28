@@ -16,10 +16,6 @@ public class Usuario {
     @Column(length = 10, nullable = false)
     private String rol;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario", referencedColumnName = "id")
-    private Farmacia farmacia;
-
     public Usuario() {}
 
     public String getId()                  { return id; }
@@ -31,6 +27,4 @@ public class Usuario {
     public String getRol()                 { return rol; }
     public void setRol(String rol)         { this.rol = rol; }
 
-    public Farmacia getFarmacia()          { return farmacia; }
-    public void setFarmacia(Farmacia f)    { this.farmacia = f; }
 }

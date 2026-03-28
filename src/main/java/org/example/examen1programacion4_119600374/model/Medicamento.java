@@ -13,8 +13,6 @@ public class Medicamento {
     @Column(length = 30, nullable = false)
     private String nombre;
 
-    // plan = cantidad de dosis que debe comprar el paciente para recibir 1 regalo
-    // Ej: plan=2 significa "2+1" → compra 2, recibe 1
     @Column
     private Integer plan;
 
@@ -29,10 +27,6 @@ public class Medicamento {
     public Integer getPlan()                { return plan; }
     public void setPlan(Integer plan)       { this.plan = plan; }
 
-    /**
-     * Retorna el label completo para mostrar en pantalla.
-     * Ej: "Taladaf 5mg (1 + 1)"
-     */
     public String getLabel() {
         return nombre + " (" + plan + " + 1)";
     }

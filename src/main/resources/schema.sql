@@ -37,8 +37,8 @@ create table PacienteMedicamento (
 alter table Farmacia add foreign key (usuario) references Usuario(id);
 alter table PacienteMedicamento add foreign key (paciente) references Paciente(id);
 alter table PacienteMedicamento add foreign key (medicamento) references Medicamento(id);
-insert into Usuario (id,clave,rol) values ('Farma10','$2a$12$UafqQkd9TVJxw9W4HoQ1eePssHEW6IPlX9VeKHWvMfiEeHGgsdOGO','FARM'); /* clave 111 */
-insert into Usuario (id,clave,rol) values ('Bomba07','$2a$12$z0dbkRqX1JSXOjAN9YX8tOWp.Es70TJl08ebtGgrwdOvgKe9dC67e','FARM'); /* clave 222 */
+insert into Usuario (id,clave,rol) values ('Farma10','$2a$10$wMrjDl0htbU5QMv1OfwoquLvvf2hbBl5IjfY5E/SOvNepRx6kn17.','FARM'); /* clave 111 */
+insert into Usuario (id,clave,rol) values ('Bomba07','$2a$10$ZUb2xuOZlGObOi6frbkKI.frej.YVDDPKZXZt0g.ttMRr67a5vSNK','FARM'); /* clave 222 */
 
 insert into Medicamento (id,nombre,plan) values ('LIP20','LipoRaven 20mg',2);
 insert into Medicamento (id,nombre,plan) values ('EZE10','Ezetemin 10mg',3);
