@@ -61,10 +61,8 @@
 <body>
 
 <div class="page-header">
-    <div>PATIENT CARE</div>
-    <div style="font-size: 28px;">&#x1F9D1;&#x200D;&#x2695;&#xFE0F; &#x1F48A; &#x1F3E5; &#x1F4C2; &#x1F441;&#xFE0F; &#x2699;&#xFE0F;</div>
+    <img th:src="@{/images/header.jpg}" alt="Patient Care" style="max-height: 80px;"/>
 </div>
-
 <div style="background-color: #2255AA; color: white; text-align: center; padding: 8px; font-weight: bold; font-size: 15px;">
     INGRESO
 </div>
@@ -72,7 +70,9 @@
 <div class="login-wrapper">
     <div class="login-card">
 
-        <div class="avatar">&#x1F464;</div>
+        <div class="avatar">
+            <img th:src="@{/images/login.png}" alt="usuario" style="width: 60px; height: 60px;"/>
+        </div>
 
         <div th:if="${param.error}" class="msg-error">
             Usuario o clave incorrectos.
