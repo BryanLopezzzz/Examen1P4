@@ -6,7 +6,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -14,15 +13,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    private final ClienteDetailsService clienteDetailsService;
+    private final UsuarioDetailsService usuarioDetailsService;
 
-    public SecurityConfig(ClienteDetailsService clienteDetailsService) {
-        this.clienteDetailsService = clienteDetailsService;
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return clienteDetailsService;
+    public SecurityConfig(UsuarioDetailsService usuarioDetailsService) {
+        this.usuarioDetailsService = usuarioDetailsService;
     }
 
     @Bean
@@ -32,38 +26,44 @@ public class SecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(usuarioDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**", "/css/**", "/js/**", "/images/**", "/index").permitAll()
+                        // Permitir login, css, h2-console sin autenticación
+                        .requestMatchers("/login", "/css/**", "/h2-console/**").permitAll()
+                        // Todo lo demás requiere estar logueado
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/index")
+                        .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/tienda", true)
+                        // Tras login exitoso va directamente al plan
+                        .defaultSuccessUrl("/presentation/plan/show", true)
+                        .failureUrl("/login?error")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        .logoutSuccessUrl("/index?logout")
+                        // Tras logout vuelve al login
+                        .logoutSuccessUrl("/login")
                         .permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
+                // Necesario para que la consola H2 funcione en iframe
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();

@@ -24,8 +24,8 @@ public class UsuarioDetailsService implements UserDetailsService {
 
         return User.builder()
                 .username(usuario.getId())
-                .password(usuario.getClave())   // ya viene con hash bcrypt del data.sql
-                .roles(usuario.getRol())        // FARM → ROLE_FARM
+                .password(usuario.getClave())
+                .roles(usuario.getRol())
                 .build();
     }
 }

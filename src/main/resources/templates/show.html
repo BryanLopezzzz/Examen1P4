@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Plan Paciente</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .top-bar {
+            background-color: #2255AA;
+            color: white;
+            text-align: center;
+            padding: 6px;
+            font-size: 14px;
+        }
+        .top-bar a {
+            color: #ffcc66;
+            font-weight: bold;
+            text-decoration: none;
+            margin-left: 10px;
+        }
+        .top-bar a:hover { text-decoration: underline; }
+
+        .farmacia-titulo {
+            text-align: center;
+            font-size: 26px;
+            margin: 18px 0 14px 0;
+        }
+        .farmacia-titulo span {
+            color: #E8630A;
+            font-weight: bold;
+        }
+
+        .buscar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 60px 10px 60px;
+        }
+        .buscar-row label {
+            color: #E8630A;
+            font-weight: bold;
+            margin: 0;
+            width: auto;
+        }
+        .buscar-row input[type=text] {
+            width: 160px;
+            padding: 4px 8px;
+            margin: 0;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+        }
+        .buscar-row button {
+            padding: 4px 14px;
+            font-size: 13px;
+            width: auto;
+        }
+        .nombre-paciente {
+            font-weight: bold;
+            color: #333;
+        }
+        .nombre-paciente.error { color: red; }
+
+        .med-area {
+            margin: 10px 60px 80px 60px;
+        }
+
+        .med-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .med-row label {
+            color: #E8630A;
+            font-weight: bold;
+            margin: 0;
+            width: auto;
+            white-space: nowrap;
+        }
+        .med-row select {
+            margin: 0;
+            padding: 4px 6px;
+            border: 1px solid #aaa;
+            width: 260px;
+        }
+        .med-row input[type=number] {
+            width: 70px;
+            padding: 4px 6px;
+            margin: 0;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+        }
+
+        /* ── botones de acción ── */
+        .btn-registrar {
+            background-color: #E8630A;
+            color: white;
+            border: none;
+            padding: 5px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            border-radius: 3px;
+        }
+        .btn-entregar {
+            background-color: #2255AA;
+            color: white;
+            border: none;
+            padding: 5px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            border-radius: 3px;
+        }
+        .btn-registrar:hover { background-color: #C4520A; }
+        .btn-entregar:hover  { background-color: #1a3e88; }
+
+        .msg-error-entregar {
+            color: red;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div>PATIENT CARE</div>
+    <div style="font-size: 26px;">&#x1F9D1;&#x200D;&#x2695;&#xFE0F; &#x1F48A; &#x1F3E5; &#x1F4C2; &#x1F441;&#xFE0F; &#x2699;&#xFE0F;</div>
+</div>
+
+<div class="top-bar">
+    <span th:text="${usuarioId}">USUARIO</span>
+    <a th:href="@{/logout}">LOGOUT</a>
+</div>
+
+<div class="farmacia-titulo">
+    Farmacia: &nbsp;<span th:text="${farmaciaNombre}">Nombre Farmacia</span>
+</div>
+
+
+<form th:action="@{/presentation/plan/buscar}" method="post">
+    <div class="buscar-row">
+        <label for="cedula">Paciente:</label>
+        <input type="text" id="cedula" name="cedula"
+               th:value="${cedula}" placeholder="Cédula"/>
+        <button type="submit" class="btn-registrar">Buscar</button>
+
+        <!-- Resultado de la búsqueda -->
+        <span th:if="${paciente != null}"
+              class="nombre-paciente"
+              th:text="${paciente.nombre}">
+        </span>
+        <span th:if="${cedula != null and !cedula.isEmpty() and paciente == null}"
+              class="nombre-paciente error">
+            Paciente no encontrado
+        </span>
+    </div>
+</form>
+
+<div class="med-area" th:if="${paciente != null and !medicamentos.isEmpty()}">
+
+    <!-- ── FLUJO 1: Registrar compra ──────────────────────────────────────── -->
+    <!--
+        El select muestra todos los medicamentos del paciente.
+        Al hacer Registrar: POST /presentation/plan/registrar
+          - pmId   = id del PacienteMedicamento seleccionado
+          - cantidad = dosis compradas
+          - cedula  = para mantener contexto en el redirect
+        Resultado: dosisafavor += cantidad  →  redirect refrescar?cedula=
+    -->
+    <form th:action="@{/presentation/plan/registrar}" method="post">
+        <input type="hidden" name="cedula" th:value="${cedula}"/>
+
+        <div class="med-row">
+            <label>Medicamento:</label>
+
+            <select name="pmId">
+                <option th:each="pm : ${medicamentos}"
+                        th:value="${pm.id}"
+                        th:text="${pm.selectLabel}">
+                </option>
+            </select>
+
+            <label>Cant. Dosis:</label>
+            <input type="number" name="cantidad" value="1" min="1"/>
+        </div>
+
+        <div class="med-row" style="margin-left: 100px; gap: 6px;">
+            <button type="submit" class="btn-registrar">Registrar</button>
+        </div>
+    </form>
+
+    <!-- ── FLUJO 2: Entregar regalía ──────────────────────────────────────── -->
+    <!--
+        Al hacer Entregar: POST /presentation/plan/medicamento/entregar
+          - pmId   = id del PacienteMedicamento seleccionado
+          - cedula  = para mantener contexto
+        Lógica en el controlador:
+          - Si dosisafavor >= plan → dosisafavor -= plan  →  redirect refrescar?cedula=
+          - Si no → addFlashAttribute("errorEntregar", "No hay dosis suficientes...")
+        NOTA: el select es independiente del de Registrar, cada form tiene el suyo.
+    -->
+    <form th:action="@{/presentation/plan/medicamento/entregar}" method="post"
+          style="margin-top: 4px;">
+        <input type="hidden" name="cedula" th:value="${cedula}"/>
+
+        <div class="med-row">
+            <!-- Select independiente para Entregar -->
+            <select name="pmId" style="margin-left: 100px; width: 260px;">
+                <option th:each="pm : ${medicamentos}"
+                        th:value="${pm.id}"
+                        th:text="${pm.selectLabel}">
+                </option>
+            </select>
+        </div>
+
+        <div class="med-row" style="margin-left: 100px;">
+            <button type="submit" class="btn-entregar">Entregar</button>
+        </div>
+
+        <div th:if="${errorEntregar != null}"
+             class="msg-error-entregar"
+             style="margin-left: 100px;"
+             th:text="${errorEntregar}">
+        </div>
+    </form>
+
+</div>
+
+<footer>
+    Todos los derechos reservados . 2026 . TotalSoft Inc. info@tsinc.com
+</footer>
+
+</body>
+</html>
