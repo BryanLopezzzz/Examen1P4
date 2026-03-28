@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Plan Paciente</title>
     <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
     <style>
         .top-bar {
             background-color: #2255AA;
@@ -66,7 +67,7 @@
 
         .med-row {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
             margin-bottom: 6px;
         }
@@ -76,6 +77,7 @@
             margin: 0;
             width: auto;
             white-space: nowrap;
+            padding-top: 4px;
         }
         .med-row select {
             margin: 0;
@@ -91,7 +93,6 @@
             border-radius: 3px;
         }
 
-        /* ── botones de acción ── */
         .btn-registrar {
             background-color: #E8630A;
             color: white;
@@ -113,10 +114,17 @@
         .btn-registrar:hover { background-color: #C4520A; }
         .btn-entregar:hover  { background-color: #1a3e88; }
 
+        .botones-col {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
         .msg-error-entregar {
             color: red;
             font-size: 13px;
             margin-top: 6px;
+            margin-left: 110px;
         }
     </style>
 </head>
@@ -135,7 +143,6 @@
     Farmacia: &nbsp;<span th:text="${farmaciaNombre}">Nombre Farmacia</span>
 </div>
 
-
 <form th:action="@{/presentation/plan/buscar}" method="post">
     <div class="buscar-row">
         <label for="cedula">Paciente:</label>
@@ -143,7 +150,6 @@
                th:value="${cedula}" placeholder="Cédula"/>
         <button type="submit" class="btn-registrar">Buscar</button>
 
-        <!-- Resultado de la búsqueda -->
         <span th:if="${paciente != null}"
               class="nombre-paciente"
               th:text="${paciente.nombre}">
@@ -157,16 +163,7 @@
 
 <div class="med-area" th:if="${paciente != null and !medicamentos.isEmpty()}">
 
-    <!-- ── FLUJO 1: Registrar compra ──────────────────────────────────────── -->
-    <!--
-        El select muestra todos los medicamentos del paciente.
-        Al hacer Registrar: POST /presentation/plan/registrar
-          - pmId   = id del PacienteMedicamento seleccionado
-          - cantidad = dosis compradas
-          - cedula  = para mantener contexto en el redirect
-        Resultado: dosisafavor += cantidad  →  redirect refrescar?cedula=
-    -->
-    <form th:action="@{/presentation/plan/registrar}" method="post">
+    <form method="post">
         <input type="hidden" name="cedula" th:value="${cedula}"/>
 
         <div class="med-row">
@@ -183,42 +180,23 @@
             <input type="number" name="cantidad" value="1" min="1"/>
         </div>
 
-        <div class="med-row" style="margin-left: 100px; gap: 6px;">
-            <button type="submit" class="btn-registrar">Registrar</button>
-        </div>
-    </form>
-
-    <!-- ── FLUJO 2: Entregar regalía ──────────────────────────────────────── -->
-    <!--
-        Al hacer Entregar: POST /presentation/plan/medicamento/entregar
-          - pmId   = id del PacienteMedicamento seleccionado
-          - cedula  = para mantener contexto
-        Lógica en el controlador:
-          - Si dosisafavor >= plan → dosisafavor -= plan  →  redirect refrescar?cedula=
-          - Si no → addFlashAttribute("errorEntregar", "No hay dosis suficientes...")
-        NOTA: el select es independiente del de Registrar, cada form tiene el suyo.
-    -->
-    <form th:action="@{/presentation/plan/medicamento/entregar}" method="post"
-          style="margin-top: 4px;">
-        <input type="hidden" name="cedula" th:value="${cedula}"/>
-
-        <div class="med-row">
-            <!-- Select independiente para Entregar -->
-            <select name="pmId" style="margin-left: 100px; width: 260px;">
-                <option th:each="pm : ${medicamentos}"
-                        th:value="${pm.id}"
-                        th:text="${pm.selectLabel}">
-                </option>
-            </select>
-        </div>
-
-        <div class="med-row" style="margin-left: 100px;">
-            <button type="submit" class="btn-entregar">Entregar</button>
+        <div class="med-row" style="margin-left: 110px;">
+            <div class="botones-col">
+                <button type="submit"
+                        class="btn-registrar"
+                        th:formaction="@{/presentation/plan/registrar}">
+                    Registrar
+                </button>
+                <button type="submit"
+                        class="btn-entregar"
+                        th:formaction="@{/presentation/plan/medicamento/entregar}">
+                    Entregar
+                </button>
+            </div>
         </div>
 
         <div th:if="${errorEntregar != null}"
              class="msg-error-entregar"
-             style="margin-left: 100px;"
              th:text="${errorEntregar}">
         </div>
     </form>

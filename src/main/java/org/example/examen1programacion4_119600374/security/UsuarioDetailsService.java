@@ -22,10 +22,7 @@ public class UsuarioDetailsService implements UserDetailsService {
         Usuario usuario = usuarioRepository.findById(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
 
-        return User.builder()
-                .username(usuario.getId())
-                .password(usuario.getClave())
-                .roles(usuario.getRol())
+        return User.builder().username(usuario.getId()).password(usuario.getClave()).roles(usuario.getRol())
                 .build();
     }
 }

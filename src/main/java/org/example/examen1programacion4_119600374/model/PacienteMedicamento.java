@@ -38,10 +38,4 @@ public class PacienteMedicamento {
     public String getSelectLabel() {
         return medicamento.getLabel() + " [" + dosisafavor + "]";
     }
-
-    public boolean puedeEntregar() {
-        return dosisafavor != null
-                && medicamento.getPlan() != null
-                && dosisafavor >= medicamento.getPlan();
-    }
 }
