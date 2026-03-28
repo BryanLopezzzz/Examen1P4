@@ -40,16 +40,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        // Permitir login, css, h2-console sin autenticación
                         .requestMatchers("/login", "/css/**", "/h2-console/**").permitAll()
-                        // Todo lo demás requiere estar logueado
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        // Tras login exitoso va directamente al plan
                         .defaultSuccessUrl("/presentation/plan/show", true)
                         .failureUrl("/login?error")
                         .permitAll()
@@ -58,12 +56,10 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        // Tras logout vuelve al login
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
-                // Necesario para que la consola H2 funcione en iframe
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();

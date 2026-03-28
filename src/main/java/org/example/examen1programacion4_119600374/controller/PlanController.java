@@ -35,10 +35,6 @@ public class PlanController {
         this.pmRepo       = pmRepo;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // GET /presentation/plan/show
-    // Muestra la página principal: campo de búsqueda vacío, sin paciente aún.
-    // ─────────────────────────────────────────────────────────────────────────
     @GetMapping("/show")
     public String show(@AuthenticationPrincipal UserDetails userDetails,
                        Model model) {
@@ -50,11 +46,6 @@ public class PlanController {
         return "plan/show";
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // GET /presentation/plan/refrescar?cedula=111
-    // Busca el paciente por cédula y recarga la misma vista con sus datos.
-    // Usado como destino de redirect tras Registrar y Entregar.
-    // ─────────────────────────────────────────────────────────────────────────
     @GetMapping("/refrescar")
     public String refrescar(@AuthenticationPrincipal UserDetails userDetails,
                             @RequestParam(required = false) String cedula,
@@ -65,10 +56,6 @@ public class PlanController {
         return "plan/show";
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // POST /presentation/plan/buscar
-    // El formulario de búsqueda envía la cédula y redirige a /refrescar.
-    // ─────────────────────────────────────────────────────────────────────────
     @PostMapping("/buscar")
     public String buscar(@RequestParam String cedula,
                          RedirectAttributes ra) {
@@ -76,36 +63,25 @@ public class PlanController {
         return "redirect:/presentation/plan/refrescar";
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // FLUJO 1 — POST /presentation/plan/registrar
-    // Suma las dosis compradas a las acumuladas del paciente-medicamento.
-    // ─────────────────────────────────────────────────────────────────────────
+    //primer flujo mencionado por el profe, suma de acumuladas a las compradas
     @PostMapping("/registrar")
     public String registrar(@RequestParam Integer pmId,
                             @RequestParam Integer cantidad,
                             @RequestParam String cedula,
                             RedirectAttributes ra) {
 
-        // Buscar el registro PacienteMedicamento por su PK
         PacienteMedicamento pm = pmRepo.findById(pmId).orElse(null);
 
         if (pm != null && cantidad != null && cantidad > 0) {
-            // Sumar las dosis compradas a las acumuladas
             pm.setDosisafavor(pm.getDosisafavor() + cantidad);
             pmRepo.save(pm);
         }
 
-        // Mantener contexto: redirigir al mismo paciente
         ra.addAttribute("cedula", cedula);
         return "redirect:/presentation/plan/refrescar";
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // FLUJO 2 — POST /presentation/plan/medicamento/entregar
-    // Verifica disponibilidad según el plan y descuenta de las acumuladas.
-    // Si plan=2, al entregar una regalía se restan 2 de las acumuladas.
-    // Si no alcanzan, muestra error "No hay dosis suficientes".
-    // ─────────────────────────────────────────────────────────────────────────
+    //en el flujo dos mencionado por le profe se hace la disponibilidad y un posible error
     @PostMapping("/medicamento/entregar")
     public String entregar(@RequestParam Integer pmId,
                            @RequestParam String cedula,
@@ -118,26 +94,20 @@ public class PlanController {
             int acumuladas    = pm.getDosisafavor();
 
             if (acumuladas >= planRequerido) {
-                // Descontar el plan de las acumuladas
                 pm.setDosisafavor(acumuladas - planRequerido);
                 pmRepo.save(pm);
             } else {
-                // No alcanza: pasar mensaje de error a la vista via flash
+               //aqui esta el error del enunciado
                 ra.addFlashAttribute("errorEntregar",
                         "No hay dosis suficientes a favor para entregar");
             }
         }
 
-        // Mantener contexto: redirigir al mismo paciente
         ra.addAttribute("cedula", cedula);
         return "redirect:/presentation/plan/refrescar";
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Helpers privados
-    // ─────────────────────────────────────────────────────────────────────────
 
-    /** Pone en el model el nombre de la farmacia del usuario logueado. */
     private void cargarFarmacia(UserDetails userDetails, Model model) {
         String usuarioId = userDetails.getUsername();
         Farmacia farmacia = farmaciaRepo.findByUsuario(usuarioId);
@@ -146,7 +116,6 @@ public class PlanController {
                 farmacia != null ? farmacia.getNombre() : usuarioId);
     }
 
-    /** Busca el paciente por cédula y carga paciente + medicamentos en el model. */
     private void buscarPaciente(String cedula, Model model) {
         model.addAttribute("cedula", cedula != null ? cedula : "");
 
