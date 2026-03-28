@@ -126,7 +126,7 @@ public class PlanController {
         }
 
         Paciente paciente = pacienteRepo.findById(cedula.trim()).orElse(null);
-        model.addAttribute("paciente", paciente); // null si no existe → vista muestra "Paciente no encontrado"
+        model.addAttribute("paciente", paciente);
 
         List<PacienteMedicamento> medicamentos = paciente != null
                 ? pmRepo.findByPaciente(paciente)
