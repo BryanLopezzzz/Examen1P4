@@ -1,5 +1,3 @@
-CREATE DATABASE PlanPaciente;
-USE PlanPaciente;
 
 create table Usuario (
                          id varchar(10) unique not null,
