@@ -1,5 +1,6 @@
 package org.example.examen1programacion4_119600374.security;
 
+import org.example.examen1programacion4_119600374.service.UsuarioDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

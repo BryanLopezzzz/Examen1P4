@@ -88,11 +88,9 @@ public class PlanController {
                            RedirectAttributes ra) {
 
         PacienteMedicamento pm = pmRepo.findById(pmId).orElse(null);
-
         if (pm != null) {
-            int planRequerido = pm.getMedicamento().getPlan(); // dosis necesarias para 1 regalo
+            int planRequerido = pm.getMedicamento().getPlan();
             int acumuladas    = pm.getDosisafavor();
-
             if (acumuladas >= planRequerido) {
                 pm.setDosisafavor(acumuladas - planRequerido);
                 pmRepo.save(pm);
@@ -118,7 +116,6 @@ public class PlanController {
 
     private void buscarPaciente(String cedula, Model model) {
         model.addAttribute("cedula", cedula != null ? cedula : "");
-
         if (cedula == null || cedula.isBlank()) {
             model.addAttribute("paciente",     null);
             model.addAttribute("medicamentos", Collections.emptyList());

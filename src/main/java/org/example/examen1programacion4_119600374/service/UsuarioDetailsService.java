@@ -1,4 +1,4 @@
-package org.example.examen1programacion4_119600374.security;
+package org.example.examen1programacion4_119600374.service;
 
 import org.example.examen1programacion4_119600374.model.Usuario;
 import org.example.examen1programacion4_119600374.repository.UsuarioRepository;
